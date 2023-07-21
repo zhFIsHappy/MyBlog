@@ -19,7 +19,7 @@ public class Article {
     private Integer viewCounts;
 
     // is top or not default: not on the top
-    private Integer weight;
+    private Integer weight = Article_Common;
 
     //first created time
     private Long createDate;

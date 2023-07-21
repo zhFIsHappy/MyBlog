@@ -5,4 +5,6 @@ import com.zhfan.blog.vo.params.PageParams;
 
 public interface ArticleService {
     Result listArticle(PageParams pageParams);
+
+    Result hotArticle(int limit);
 }

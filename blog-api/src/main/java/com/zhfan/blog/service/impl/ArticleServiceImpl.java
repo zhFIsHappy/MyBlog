@@ -2,6 +2,7 @@ package com.zhfan.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zhfan.blog.dao.mapper.ArticleMapper;
 import com.zhfan.blog.dao.pojo.Article;
 import com.zhfan.blog.service.ArticleService;
@@ -34,8 +35,6 @@ public class ArticleServiceImpl implements ArticleService {
     private SysUserService sysUserService;
     @Override
     public Result listArticle(PageParams pageParams) {
-
-        // 29 maybe wrong
         Page<Article> page  = new Page<>(pageParams.getPage(), pageParams.getPageSize());
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
 
@@ -44,8 +43,19 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
         List<Article> records = articlePage.getRecords();
+
         List<ArticleVo> articleVoList = copyList(records, true, true );
         return Result.success(articleVoList);
+    }
+
+    @Override
+    public Result hotArticle(int limit) {
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Article::getViewCounts);
+        queryWrapper.select(Article::getId, Article::getTitle);
+        queryWrapper.last("limit " + limit);
+        List<Article> articles = articleMapper.selectList(queryWrapper);
+        return Result.success(copyList(articles, false, false));
     }
 
     private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor) {
@@ -59,6 +69,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleVo copy(Article article, boolean isTag, boolean isAuthor ){
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article,articleVo);
+
         articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
         if(isTag) {
             Long articleId = article.getId();

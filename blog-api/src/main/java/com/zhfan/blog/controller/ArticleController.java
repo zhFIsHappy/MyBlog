@@ -15,7 +15,15 @@ public class ArticleController {
     private ArticleService articleService;
     @PostMapping
     public Result listArticle(@RequestBody PageParams pageParams){
-        System.out.println("3");
+
+
         return articleService.listArticle(pageParams);
+    }
+
+    @PostMapping("/hot")
+    public Result hotArticle(){
+        int limit = 5;
+
+        return articleService.hotArticle(limit);
     }
 }
